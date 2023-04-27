@@ -1,6 +1,13 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 
 const Register = () => {
+
+  const handleSubmit = () => {
+
+    console.log("first")
+  }
+
   return (
     <div className='flex justify-center items-center pt-8'>
       <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -9,6 +16,7 @@ const Register = () => {
           <p className='text-sm text-gray-400'>Create a new account</p>
         </div>
         <form
+        onSubmit={handleSubmit}
           noValidate=''
           action=''
           className='space-y-12 ng-untouched ng-pristine ng-valid'
@@ -104,9 +112,9 @@ const Register = () => {
         </div>
         <p className='px-6 text-sm text-center text-gray-400'>
           Already have an account yet?{' '}
-          <a href='#' className='hover:underline text-gray-600'>
+          <Link to='/login' className='hover:underline text-gray-600'>
             Sign In
-          </a>
+          </Link>
           .
         </p>
       </div>
