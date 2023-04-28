@@ -1,11 +1,58 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+import { toast } from 'react-toastify'
+import { AuthContext } from './Context/UserContext'
+// import { AuthContext } from '../contexts/UserContext'
 
 const Register = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/'
+  const { createUser, updateName, verifyEmail, signInWithGoogle } =
+    useContext(AuthContext)
 
-  const handleSubmit = () => {
+  // Signup using Email & Pass
+  const handleSubmit = event => {
+    event.preventDefault()
 
-    console.log("first")
+    const name = event.target.name.value
+    const email = event.target.email.value
+    const password = event.target.password.value
+
+    //1. Create Account
+    createUser(email, password)
+      .then(result => {
+        console.log(result.user)
+
+        //2. Update Name
+        updateName(name)
+          .then(() => {
+            toast.success('Name Updated')
+
+            //3. Email verification
+            verifyEmail()
+              .then(() => {
+                toast.success('Please check your email for verification link')
+                navigate(from, { replace: true })
+              })
+              .catch(error => {
+                toast.error(error.message)
+              })
+          })
+          .catch(error => {
+            toast.error(error.message)
+          })
+      })
+      .catch(error => console.log(error))
+  }
+
+  // Google Signin
+  const handleGoogleSignin = () => {
+    signInWithGoogle().then(result => {
+      console.log(result.user)
+      navigate(from, { replace: true })
+    })
   }
 
   return (
@@ -16,7 +63,7 @@ const Register = () => {
           <p className='text-sm text-gray-400'>Create a new account</p>
         </div>
         <form
-        onSubmit={handleSubmit}
+          onSubmit={handleSubmit}
           noValidate=''
           action=''
           className='space-y-12 ng-untouched ng-pristine ng-valid'
@@ -82,7 +129,11 @@ const Register = () => {
           <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
         </div>
         <div className='flex justify-center space-x-4'>
-          <button aria-label='Log in with Google' className='p-3 rounded-sm'>
+          <button
+            onClick={handleGoogleSignin}
+            aria-label='Log in with Google'
+            className='p-3 rounded-sm'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 32 32'
