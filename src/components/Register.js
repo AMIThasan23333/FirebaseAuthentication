@@ -34,18 +34,12 @@ const handleSubmit = (e) => {
 
       sendEmailVerification(auth.currentUser)
           .then(() => {
-            // Email verification sent!
-            // ...
+           
+            toast.success('Check email For Verification link  ')
           });
-
-
-
-    }).catch((error) => {
-      
+    }).catch((error) => {      
       toast.error(error.message)
     });
-
-
   })
 
   .catch(error =>  console.log(error))
@@ -53,6 +47,14 @@ const handleSubmit = (e) => {
   // console.log(name,email,password);
 }
 
+
+
+/* sign up with pop up */
+
+const handleGoogleSignIn = () => {
+
+  console.log("first")
+}
 
 
   return (
@@ -130,7 +132,9 @@ const handleSubmit = (e) => {
           <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
         </div>
         <div className='flex justify-center space-x-4'>
-          <button aria-label='Log in with Google' className='p-3 rounded-sm'>
+          <button
+          onClick={handleGoogleSignIn}
+          aria-label='Log in with Google' className='p-3 rounded-sm'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 32 32'
