@@ -1,4 +1,50 @@
+import { useContext, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { AuthContext } from './Context/UserContext'
+// import { AuthContext } from '../contexts/UserContext'
+
 const Login = () => {
+  const [userEmail, setUserEmail] = useState('')
+  // const [showPass, setShowPass] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/'
+
+  const { signin, resetPassword, signInWithGoogle } = useContext(AuthContext)
+
+  const handleSubmit = event => {
+    event.preventDefault()
+
+    const email = event.target.email.value
+    const password = event.target.password.value
+
+    signin(email, password)
+      .then(result => {
+        toast.success('Login Success!')
+        navigate(from, { replace: true })
+        console.log(result.user)
+      })
+      .catch(error => toast.error(error.message))
+  }
+
+  // Google Signin
+  const handleGoogleSignin = () => {
+    signInWithGoogle().then(result => {
+      console.log(result.user)
+      navigate(from, { replace: true })
+    })
+  }
+
+  //Reset Pass
+  const handleReset = () => {
+    resetPassword(userEmail)
+      .then(() => {
+        toast.success('Reset link has been sent, please check email')
+      })
+      .catch(error => toast.error(error.message))
+  }
+
   return (
     <div className='flex justify-center items-center pt-8'>
       <div className='flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900'>
@@ -9,6 +55,7 @@ const Login = () => {
           </p>
         </div>
         <form
+          onSubmit={handleSubmit}
           noValidate=''
           action=''
           className='space-y-6 ng-untouched ng-pristine ng-valid'
@@ -19,6 +66,7 @@ const Login = () => {
                 Email address
               </label>
               <input
+                onBlur={event => setUserEmail(event.target.value)}
                 type='email'
                 name='email'
                 id='email'
@@ -34,12 +82,17 @@ const Login = () => {
                 </label>
               </div>
               <input
+                // type={showPass ? 'text' : 'password'}
                 type='password'
                 name='password'
                 id='password'
                 placeholder='*******'
                 className='w-full px-3 py-2 border rounded-md border-gray-300 bg-gray-200 focus:border-gray-900 text-gray-900'
               />
+
+              {/* <button onClick={() => setShowPass(!showPass)}>
+                Show Password
+              </button> */}
             </div>
           </div>
 
@@ -53,7 +106,10 @@ const Login = () => {
           </div>
         </form>
         <div className='space-y-1'>
-          <button className='text-xs hover:underline text-gray-400'>
+          <button
+            onClick={handleReset}
+            className='text-xs hover:underline text-gray-400'
+          >
             Forgot password?
           </button>
         </div>
@@ -65,7 +121,11 @@ const Login = () => {
           <div className='flex-1 h-px sm:w-16 dark:bg-gray-700'></div>
         </div>
         <div className='flex justify-center space-x-4'>
-          <button aria-label='Log in with Google' className='p-3 rounded-sm'>
+          <button
+            onClick={handleGoogleSignin}
+            aria-label='Log in with Google'
+            className='p-3 rounded-sm'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 32 32'
@@ -95,9 +155,9 @@ const Login = () => {
         </div>
         <p className='px-6 text-sm text-center text-gray-400'>
           Don't have an account yet?{' '}
-          <a href='#' to='/register' className='hover:underline text-gray-600'>
+          <Link to='/register' className='hover:underline text-gray-600'>
             Sign up
-          </a>
+          </Link>
           .
         </p>
       </div>
