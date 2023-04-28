@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { createUserWithEmailAndPassword, getAuth, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from 'firebase/auth';
 import app from './Firebase/firebase.congfig';
 import { toast } from 'react-toastify';
 
@@ -30,8 +30,14 @@ const handleSubmit = (e) => {
      
       toast.success('name updated ')
 
-      console.log(auth.currentUser);
-      
+      console.log(auth.currentUser.displayName);
+
+      sendEmailVerification(auth.currentUser)
+          .then(() => {
+            // Email verification sent!
+            // ...
+          });
+
 
 
     }).catch((error) => {
