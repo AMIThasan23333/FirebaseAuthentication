@@ -1,5 +1,21 @@
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from './Context/UserContext';
+import { toast } from 'react-toastify';
 const Navbar = () => {
+
+  const {user,logout } = useContext(AuthContext);
+
+
+
+  const handleLogout = () => {
+
+   logout()
+   .then(toast.warning('User Updated Successfully'))
+   .catch( error => console.log(error))
+
+  }
+
 
   return (
     <header className='text-gray-600 body-font'>
@@ -26,13 +42,17 @@ const Navbar = () => {
             Home
           </Link>
 
-          <Link to='/profile' className='mr-5 hover:text-gray-900'>
+          {user?.email ?  <>
+          
+            <Link to='/profile' className='mr-5 hover:text-gray-900'>
             Profile
           </Link>
           <Link to='/wallet' className='mr-5 hover:text-gray-900'>
             Wallet
           </Link>
-          <button className='inline-flex items-center bg-gray-300 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0'>
+          <button 
+          onClick={handleLogout}
+          className='inline-flex items-center bg-gray-300 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0'>
             Logout
             <svg
               fill='none'
@@ -46,10 +66,17 @@ const Navbar = () => {
               <path d='M5 12h14M12 5l7 7-7 7'></path>
             </svg>
           </button>
-
-          <Link to='/login' className='mr-5 hover:text-gray-900'>
+          
+           </> :
+           <Link to='/login' className='mr-5 hover:text-gray-900'>
             Login
           </Link>
+          
+          }
+
+      
+
+      
         </nav>
       </div>
     </header>

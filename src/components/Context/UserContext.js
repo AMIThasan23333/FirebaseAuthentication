@@ -67,13 +67,14 @@ import {
       return sendPasswordResetEmail(auth, email)
     }
   
+    
+
     useEffect(() => {
       //this part will execute once the component is mounted.
       const unsubscribe = onAuthStateChanged(auth, currentUser => {
         setUser(currentUser)
         setLoading(false)
       })
-  
       return () => {
         //this part will execute once the component is unmounted.
         unsubscribe()

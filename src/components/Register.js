@@ -1,61 +1,59 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from 'firebase/auth';
-import app from './Firebase/firebase.congfig';
-import { toast } from 'react-toastify';
+import React, { useContext } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-
-
-
-const auth = getAuth(app)
-
+import { toast } from 'react-toastify'
+import { AuthContext } from './Context/UserContext'
+// import { AuthContext } from '../contexts/UserContext'
 
 const Register = () => {
-const handleSubmit = (e) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/'
+  const { createUser, updateName, verifyEmail, signInWithGoogle } =
+    useContext(AuthContext)
 
-     
-  e.preventDefault()
-  const name = e.target.name.value;
-  const email = e.target.email.value;
-  const password = e.target.password.value;
+  // Signup using Email & Pass
+  const handleSubmit = event => {
+    event.preventDefault()
 
+    const name = event.target.name.value
+    const email = event.target.email.value
+    const password = event.target.password.value
 
-  createUserWithEmailAndPassword(auth,email,password)
-  .then( result => {
+    //1. Create Account
+    createUser(email, password)
+      .then(result => {
+        console.log(result.user)
 
-    // console.log(result.user);
-    updateProfile(auth.currentUser, {
-      displayName: name,
-    }).then(() => {
-     
-      toast.success('name updated ')
-
-      console.log(auth.currentUser.displayName);
-
-      sendEmailVerification(auth.currentUser)
+        //2. Update Name
+        updateName(name)
           .then(() => {
-           
-            toast.success('Check email For Verification link  ')
-          });
-    }).catch((error) => {      
-      toast.error(error.message)
-    });
-  })
+            toast.success('Name Updated')
 
-  .catch(error =>  console.log(error))
+            //3. Email verification
+            verifyEmail()
+              .then(() => {
+                toast.success('Please check your email for verification link')
+                navigate(from, { replace: true })
+              })
+              .catch(error => {
+                toast.error(error.message)
+              })
+          })
+          .catch(error => {
+            toast.error(error.message)
+          })
+      })
+      .catch(error => console.log(error))
+  }
 
-  // console.log(name,email,password);
-}
-
-
-
-/* sign up with pop up */
-
-const handleGoogleSignIn = () => {
-
-  console.log("first")
-}
-
+  // Google Signin
+  const handleGoogleSignin = () => {
+    signInWithGoogle().then(result => {
+      console.log(result.user)
+      navigate(from, { replace: true })
+    })
+  }
 
   return (
     <div className='flex justify-center items-center pt-8'>
@@ -65,8 +63,7 @@ const handleGoogleSignIn = () => {
           <p className='text-sm text-gray-400'>Create a new account</p>
         </div>
         <form
-
-        onSubmit={handleSubmit }
+          onSubmit={handleSubmit}
           noValidate=''
           action=''
           className='space-y-12 ng-untouched ng-pristine ng-valid'
@@ -133,8 +130,10 @@ const handleGoogleSignIn = () => {
         </div>
         <div className='flex justify-center space-x-4'>
           <button
-          onClick={handleGoogleSignIn}
-          aria-label='Log in with Google' className='p-3 rounded-sm'>
+            onClick={handleGoogleSignin}
+            aria-label='Log in with Google'
+            className='p-3 rounded-sm'
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               viewBox='0 0 32 32'
@@ -164,7 +163,7 @@ const handleGoogleSignIn = () => {
         </div>
         <p className='px-6 text-sm text-center text-gray-400'>
           Already have an account yet?{' '}
-          <Link href='#' className='hover:underline text-gray-600'>
+          <Link to='/login' className='hover:underline text-gray-600'>
             Sign In
           </Link>
           .
